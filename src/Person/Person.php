@@ -17,4 +17,38 @@ class Person
     {
         return $this->name . ' (на сайте с ' . $this->registeredOn->format('Y-m-d') . ')';
     }
+
+    /**
+     * @return Name
+     */
+    public function getName(): Name
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param Name $name
+     */
+    public function setName(Name $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return DateTimeImmutable
+     */
+    public function getRegisteredOn(): DateTimeImmutable
+    {
+        return $this->registeredOn;
+    }
+
+    /**
+     * @param DateTimeImmutable $registeredOn
+     */
+    public function setRegisteredOn(DateTimeImmutable $registeredOn): void
+    {
+        $this->registeredOn = $registeredOn;
+    }
+
+
 }
