@@ -9,8 +9,8 @@ use GeekBrains\LevelTwo\Blog\Exceptions\{AppException,
     InvalidArgumentException, PostNotFoundException, UserNotFoundException};
 
 include __DIR__ . "/vendor/autoload.php";
-include "sqlite.php";
-//$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
+
+$connection = new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
 
 $faker = Faker\Factory::create('ru_RU');
 
