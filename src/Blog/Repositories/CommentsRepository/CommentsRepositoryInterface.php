@@ -1,6 +1,6 @@
 <?php
 
-namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
+namespace GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository;
 
 use GeekBrains\LevelTwo\Blog\{Comment, UUID};
 

@@ -2,11 +2,10 @@
 
 namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
 
-use GeekBrains\LevelTwo\Blog\{Post, Repositories\UsersRepository\SqliteUsersRepository, User, UUID};
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\PostsRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, UserNotFoundException, PostNotFoundException};
-use \PDO;
-use \PDOStatement;
+use GeekBrains\LevelTwo\Blog\{Post, Repositories\UsersRepository\SqliteUsersRepository, UUID};
+use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, PostNotFoundException, UserNotFoundException};
+use PDO;
+use PDOStatement;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
@@ -57,9 +56,7 @@ VALUES (:uuid, :author_uuid, :title, :text)'
      * @throws UserNotFoundException
      * @throws InvalidArgumentException
      */
-    private function getPost(PDOStatement          $statement,
-                             string                $errString,
-                             SqliteUsersRepository $usersRepository): Post
+    private function getPost(PDOStatement $statement, string $errString,): Post
     {
 
         $result = $statement->fetch(PDO::FETCH_ASSOC);
@@ -70,7 +67,8 @@ VALUES (:uuid, :author_uuid, :title, :text)'
             );
         }
 
-        $user = $usersRepository->get($result['author_uuid']);
+        $userRepository = new SqliteUsersRepository($this->connection);
+        $user = $userRepository->get(new UUID($result['author_uuid']));
 
         return new Post(
             new UUID($result['uuid']),
