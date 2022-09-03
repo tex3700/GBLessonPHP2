@@ -11,7 +11,7 @@ class UUID
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private string $uuidString
+        private string $uuidString,
     ) {
         if (!uuid_is_valid($this->uuidString)) {
             throw new InvalidArgumentException(

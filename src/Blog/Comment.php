@@ -5,27 +5,17 @@ namespace GeekBrains\LevelTwo\Blog;
 
 class Comment
 {
-    private UUID $uuid;
-    private User $author;
-    private Post $recensionPost;
-    private string $text;
-
     public function __construct(
-        UUID    $uuid,
-        User $author,
-        Post   $recensionPost,
-        string $text
-    )
-    {
-        $this->uuid = $uuid;
-        $this->author = $author;
-        $this->recensionPost = $recensionPost;
-        $this->text = $text;
+        private UUID $uuid,
+    	private User $author,
+    	private Post $recensionPost,
+    	private string $comment_text
+    ) {
     }
 
     public function __toString()
     {
-        return $this->author . ' пишет к статье: ' . PHP_EOL .'"'. $this->recensionPost->getText() .'"'. PHP_EOL . " комментарий >>> " . $this->text  . PHP_EOL;
+        return $this->author . ' пишет к статье: ' . PHP_EOL .'"'. $this->recensionPost->getText() .'"'. PHP_EOL . " комментарий >>> " . $this->comment_text  . PHP_EOL;
     }
 
     /**
@@ -81,17 +71,15 @@ class Comment
      */
     public function getText(): string
     {
-        return $this->text;
+        return $this->comment_text;
     }
 
-    /**
-     * @param string $text
-     */
-    public function setText(string $text): void
+	/**
+	 * @param string $comment_text
+	 */
+    public function setText(string $comment_text): void
     {
-        $this->text = $text;
+		$this->comment_text = $comment_text;
     }
-
-
 
 }
