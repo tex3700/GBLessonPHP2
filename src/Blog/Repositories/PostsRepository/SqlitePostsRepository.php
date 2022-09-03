@@ -25,14 +25,14 @@ class SqlitePostsRepository implements PostsRepositoryInterface
     {
         $statement = $this->connection->prepare(
             'INSERT INTO posts (uuid, author_uuid, post_title, post_text) 
-VALUES (:uuid, :author_uuid, :title, :text)'
+VALUES (:uuid, :author_uuid, :post_title, :post_text)'
         );
 
         $statement->execute([
             ':uuid' => (string)$post->uuid(),
             ':author_uuid' => $post->getAuthor()->uuid(),
-            ':title' => $post->getPostHeader(),
-            ':text' => $post->getText()
+            ':post_title' => $post->getPostHeader(),
+            ':post_text' => $post->getText()
         ]);
     }
 
@@ -73,11 +73,18 @@ VALUES (:uuid, :author_uuid, :title, :text)'
         return new Post(
             new UUID($result['uuid']),
             $user,
-            $result['title'],
-            $result['text']
+            $result['post_title'],
+            $result['post_text']
         );
     }
 
 
+	public function delete(UUID $uuid): void
+	{
+		$statement = $this->connection->prepare(
+			'DELETE FROM posts WHERE uuid = :uuid'
+		);
 
+		$statement->execute([':uuid' => $uuid]);
+	}
 }

@@ -85,4 +85,13 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
             $result['comment_text']
         );
     }
+
+	public function delete(UUID $uuid): void
+	{
+		$statement = $this->connection->prepare(
+			'DELETE FROM comments WHERE uuid = :uuid'
+		);
+
+		$statement->execute([':uuid' => $uuid]);
+	}
 }

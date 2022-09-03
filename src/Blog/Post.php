@@ -2,26 +2,19 @@
 
 namespace GeekBrains\LevelTwo\Blog;
 
+use GeekBrains\LevelTwo\Blog\UUID;
 
 class Post
 {
-    private UUID $uuid;
-    private User $author;
-    private string $title;
-    private string $text;
 
-    public function __construct(
-        UUID $uuid,
-        User $author,
-        string $title,
-        string $text
-    )
-    {
-        $this->uuid = $uuid;
-        $this->title = $title;
-        $this->text = $text;
-        $this->author = $author;
-    }
+	public function __construct(
+        private UUID $uuid,
+        private User $author,
+        private string $title,
+        private string $text
+    ) {
+	}
+
 
     public function __toString()
     {
