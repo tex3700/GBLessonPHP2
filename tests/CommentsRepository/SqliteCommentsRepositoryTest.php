@@ -75,8 +75,8 @@ class SqliteCommentsRepositoryTest extends TestCase
             'author_uuid' => '5a91ed7a-0ae4-495f-b666-c52bc8f13fe4',
             'comment_text' => 'Some comment text',
             'post_uuid' => '723e4567-e89b-12d3-a456-426614174000',
-            'title' => 'Some title',
-            'text' => 'Some text',
+            'post_title' => 'Some title',
+            'post_text' => 'Some text',
             'username' => 'ivan123',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin'

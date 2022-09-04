@@ -25,8 +25,8 @@ class SqlitePostsRepositoryTest extends TestCase
             ->with([
                 ':uuid' => '123e4567-e89b-12d3-a456-426614174000',
                 ':author_uuid' => '123e4567-e89b-12d3-a456-426614174000',
-                ':title' => 'Ivan',
-                ':text' => 'Nikitin',
+                ':post_title' => 'Ivan',
+                ':post_text' => 'Nikitin',
             ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);
@@ -57,8 +57,8 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementMock->method('fetch')->willReturn([
             'uuid' => '7b094211-1881-40f4-ac73-365ad0b2b2d4',
             'author_uuid' => '5a91ed7a-0ae4-495f-b666-c52bc8f13fe4',
-            'title' => 'Some title',
-            'text' => 'Some text',
+            'post_title' => 'Some title',
+            'post_text' => 'Some text',
             'username' => 'ivan123',
             'first_name' => 'Ivan',
             'last_name' => 'Nikitin',
