@@ -2,6 +2,7 @@
 
 namespace GeekBrains\LevelTwo\HTTP\Actions\Likes;
 
+use GeekBrains\LevelTwo\Blog\CommentsLike;
 use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
@@ -57,7 +58,7 @@ class CreateCommentLikes implements ActionInterface
 
 		try {
 			$checkLikes = $this->commentLikesRepository->getByCommentUuid($comment_uuid);
-		} catch (\InvalidArgumentException $exception) {
+		} catch (InvalidArgumentException $exception) {
 			return new ErrorResponse($exception->getMessage());
 		}
 
@@ -70,7 +71,7 @@ class CreateCommentLikes implements ActionInterface
 		$newLikeUuid = UUID::random();
 
 		try {
-			$commentLike = new Like(
+			$commentLike = new CommentsLike(
 				$newLikeUuid,
 				$comment_uuid,
 				$author_uuid,

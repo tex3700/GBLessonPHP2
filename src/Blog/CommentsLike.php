@@ -27,17 +27,9 @@ class CommentsLike
 		$this->uuid = $uuid;
 	}
 
-	/**
-	 * @return UUID
-	 */
 	public function getCommentUuid(): string
 	{
 		return $this->comment_uuid;
-	}
-
-	public function setCommentUuid(UUID $comment_uuid): void
-	{
-		$this->comment_uuid = $comment_uuid;
 	}
 
 	public function getAuthorUuid(): string
@@ -53,6 +45,13 @@ class CommentsLike
 		$this->author_uuid = $author_uuid;
 	}
 
+	/**
+	 * @param UUID $comment_uuid
+	 */
+	public function setCommentUuid(UUID $comment_uuid): void
+	{
+		$this->comment_uuid = $comment_uuid;
+	}
 
 
 }

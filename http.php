@@ -39,13 +39,9 @@ $routes = [
 	],
 	'POST' => [
 		'/users/create' => CreateUser::class,
-
 		'/posts/create' => CreatePost::class,
-
 		'/posts/comment' => CreateComment::class,
-
 		'/posts/likes' => CreateLikes::class,
-
 		'/comments/likes' => CreateCommentLikes::class,
 	],
 

@@ -9,6 +9,8 @@ use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\LikesRepositoryInterfa
 use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\SqliteLikesRepository;
 use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\CommentLikesRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\SqliteCommentLikesRepository;
+use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
+use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -32,6 +34,11 @@ $container->bind(
 $container->bind(
 	LikesRepositoryInterface::class,
 	SqliteLikesRepository::class
+);
+
+$container->bind(
+	CommentsRepositoryInterface::class,
+	SqliteCommentsRepository::class
 );
 
 $container->bind(

@@ -2,7 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Blog;
 
-class Like extends \GeekBrains\LevelTwo\Blog\CommentsLike
+class Like
 {
 	public function __construct(
 		private UUID $uuid,
