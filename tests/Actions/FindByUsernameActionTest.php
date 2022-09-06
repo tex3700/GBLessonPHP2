@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPUnit\Actions;
+namespace GeekBrains\PHPUnit\Actions;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\{UserNotFoundException, InvalidArgumentException, JsonException};
 use GeekBrains\LevelTwo\Blog\User;

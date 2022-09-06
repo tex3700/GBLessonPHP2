@@ -1,19 +1,18 @@
 <?php
 
-namespace PHPUnit\CommentsRepository;
+namespace GeekBrains\PHPUnit\Repositories\CommentsRepository;
 
+use GeekBrains\LevelTwo\Blog\{Post, User, UUID};
 use GeekBrains\LevelTwo\Blog\Comment;
-use GeekBrains\LevelTwo\Blog\Exceptions\{
-    CommentNotFoundException,
-    InvalidArgumentException,
-    PostNotFoundException,
-    UserNotFoundException };
-use GeekBrains\LevelTwo\Blog\{ Post, User, UUID };
+use GeekBrains\LevelTwo\Blog\Exceptions\{CommentNotFoundException,
+	InvalidArgumentException,
+	PostNotFoundException,
+	UserNotFoundException};
 use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use GeekBrains\LevelTwo\Person\Name;
-use PHPUnit\Framework\TestCase;
 use PDO;
 use PDOStatement;
+use PHPUnit\Framework\TestCase;
 
 class SqliteCommentsRepositoryTest extends TestCase
 {

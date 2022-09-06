@@ -63,8 +63,8 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
      * @throws InvalidArgumentException
      * @throws CommentNotFoundException
      */
-    private function getComment(PDOStatement $statement, string $errString ): Comment {
-
+    private function getComment(PDOStatement $statement, string $errString ): Comment
+	{
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {

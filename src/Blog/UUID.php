@@ -7,7 +7,7 @@ use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 class UUID
 {
 
-    /**
+	/**
      * @throws InvalidArgumentException
      */
     public function __construct(

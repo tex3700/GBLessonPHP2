@@ -1,11 +1,8 @@
 <?php
 
-namespace PHPUnit\PostsRepository;
+namespace GeekBrains\PHPUnit\Repositories\PostsRepository;
 
-use GeekBrains\LevelTwo\Blog\{Exceptions\PostNotFoundException,
-    Post,
-    User,
-    UUID};
+use GeekBrains\LevelTwo\Blog\{Exceptions\PostNotFoundException, Post, User, UUID};
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use GeekBrains\LevelTwo\Person\Name;
 use PDO;
