@@ -7,23 +7,23 @@ use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
+use GeekBrains\LevelTwo\Person\Name;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteCommentsRepository implements CommentsRepositoryInterface
 {
 
-    private PDO $connection;
-
-    /**
-     * @param PDO $connection
-     */
-    public function __construct(PDO $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+		private PDO $connection,
+		private LoggerInterface $logger
+	) {
     }
 
 
@@ -40,6 +40,8 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
             ':author_uuid' => $comment->getAuthor()->uuid(),
             ':comment_text' => $comment->getText()
         ]);
+
+		$this->logger->info("Comment ({$comment->uuid()}) was saved to database");
     }
 
     /**
@@ -50,7 +52,17 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
     public function get(UUID $uuid): Comment
     {
         $statement = $this->connection->prepare(
-            'SELECT * FROM comments WHERE uuid = ?'
+            'SELECT 
+    				comments.uuid,
+    				comments.post_uuid,
+    				comments.author_uuid,
+    				comments.comment_text,
+    				users.username,
+    				users.first_name,
+    				users.last_name,
+    				FROM comments 
+    				INNER JOIN users ON users.uuid = comments.author_uuid
+    				WHERE uuid = ?'
         );
         $statement->execute([(string)$uuid]);
 
@@ -68,19 +80,34 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+			$this->logger->warning("Comment ($errString) not found");
             throw new CommentNotFoundException(
                 "Cannot find comment: $errString"
             );
         }
 
-        $userRepository = new SqliteUsersRepository($this->connection);
-        $postsRepository = new SqlitePostsRepository($this->connection);
-        $user = $userRepository->get(new UUID($result['author_uuid']));
-        $post = $postsRepository->get(new UUID($result['post_uuid']));
+//        $userRepository = new SqliteUsersRepository($this->connection);
+//        $postsRepository = new SqlitePostsRepository($this->connection);
+//        $user = $userRepository->get(new UUID($result['author_uuid']));
+//        $post = $postsRepository->get(new UUID($result['post_uuid']));
+
+		$commentAuthor = new User(
+			new UUID($result['author_uuid']),
+			new Name(
+				$result['first_name'],
+				$result['last_name'],
+			),
+			$result['username'],
+		);
+
+		$postsRepository = new SqlitePostsRepository(
+			$this->connection,
+				$this->logger);
+		$post = $postsRepository->get(new UUID($result['post_uuid']));
 
         return new Comment(
             new UUID($result['uuid']),
-            $user,
+			$commentAuthor,
             $post,
             $result['comment_text']
         );

@@ -7,14 +7,14 @@ use GeekBrains\LevelTwo\Blog\{User, UUID};
 use GeekBrains\LevelTwo\Person\Name;
 use \PDO;
 use \PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
-    private PDO $connection;
-
-    public function __construct (PDO $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+		private PDO $connection,
+		private LoggerInterface $logger
+	) {
     }
 
 
@@ -31,6 +31,8 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             ':first_name' => $user->name()->first(),
             ':last_name' => $user->name()->last()
         ]);
+
+		$this->logger->info("User ({$user->uuid()}) was saved to database");
     }
 
     /**
@@ -75,6 +77,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+			$this->logger->warning("User ($errString) not found");
             throw new UserNotFoundException(
                 "Cannot find user: $errString"
             );

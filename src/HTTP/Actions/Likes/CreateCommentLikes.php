@@ -72,9 +72,9 @@ class CreateCommentLikes implements ActionInterface
 
 		try {
 			$commentLike = new CommentsLike(
-				$newLikeUuid,
-				$comment_uuid,
-				$author_uuid,
+				uuid: $newLikeUuid,
+				comment_uuid: $comment_uuid,
+				author_uuid: $author_uuid,
 			);
 		} catch (HttpException $exception) {
 			return new ErrorResponse($exception->getMessage());

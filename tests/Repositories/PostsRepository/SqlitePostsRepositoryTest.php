@@ -8,6 +8,7 @@ use GeekBrains\LevelTwo\Person\Name;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
+use GeekBrains\PHPUnit\DummyLogger;
 
 class SqlitePostsRepositoryTest extends TestCase
 {
@@ -28,7 +29,10 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
 
         $user = new User(
             new UUID('123e4567-e89b-12d3-a456-426614174000'),
@@ -63,7 +67,10 @@ class SqlitePostsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $postRepository = new SqlitePostsRepository($connectionStub);
+        $postRepository = new SqlitePostsRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
         $post = $postRepository->get(new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'));
 
         $this->assertSame('7b094211-1881-40f4-ac73-365ad0b2b2d4', (string)$post->uuid());
@@ -82,7 +89,10 @@ class SqlitePostsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqlitePostsRepository($connectionStub);
+        $repository = new SqlitePostsRepository(
+			$connectionStub,
+			new DummyLogger()
+	);
 
         $this->expectExceptionMessage('Cannot find post: d02eef61-1a06-460f-b859-202b84164734');
         $this->expectException(PostNotFoundException::class);

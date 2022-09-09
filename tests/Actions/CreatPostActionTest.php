@@ -6,20 +6,41 @@ use GeekBrains\LevelTwo\Blog\Exceptions\JsonException;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
+use GeekBrains\LevelTwo\Blog\Exceptions\AuthException;
 use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Http\Actions\Posts\CreatePost;
+use GeekBrains\LevelTwo\HTTP\Auth\IdentificationInterface;
+use GeekBrains\LevelTwo\HTTP\Auth\JsonBodyUuidIdentification;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
 use GeekBrains\LevelTwo\Person\Name;
+use GeekBrains\PHPUnit\DummyLogger;
 use PHPUnit\Framework\TestCase;
 
 class CreatPostActionTest extends TestCase
 {
+	private function identification($userRepository): IdentificationInterface
+	{
+		return new class($userRepository) implements IdentificationInterface
+		{
+			public function __construct(
+				private UsersRepositoryInterface $usersRepository
+			) {
+			}
+
+			public function user(Request $request): User
+			{
+				$userUuid = new UUID($request->jsonBodyField('author_uuid'));
+				return $this->usersRepository->get($userUuid);
+			}
+		};
+	}
+
 	private function usersRepository(array $users): UsersRepositoryInterface
 	{
 		return new class($users) implements UsersRepositoryInterface
@@ -41,6 +62,7 @@ class CreatPostActionTest extends TestCase
 						return $user;
 					}
 				}
+
 				throw new UserNotFoundException('Cannot find user: ' . $uuid);
 			}
 
@@ -112,7 +134,12 @@ class CreatPostActionTest extends TestCase
 			),
 		]);
 
-		$action = new CreatePost($usersRepository, $postsRepository);
+		$identification = $this->identification($usersRepository);
+
+		$action = new CreatePost(
+			$identification,
+			$postsRepository,
+			new DummyLogger());
 
 		$response = $action->handle($request);
 
@@ -150,7 +177,13 @@ class CreatPostActionTest extends TestCase
 		$postsRepository = $this->postsRepository();
 		$usersRepository = $this->usersRepository([]);
 
-		$action = new CreatePost($usersRepository, $postsRepository);
+		$identification = $this->identification($usersRepository);
+
+		$action = new CreatePost(
+			$identification,
+			$postsRepository,
+			new DummyLogger()
+		);
 
 		$response = $action->handle($request);
 
@@ -178,7 +211,13 @@ class CreatPostActionTest extends TestCase
 			),
 		]);
 
-		$action = new CreatePost($usersRepository, $postsRepository);
+		$identification = $this->identification($usersRepository);
+
+		$action = new CreatePost(
+			$identification,
+			$postsRepository,
+			new DummyLogger()
+		);
 
 		$response = $action->handle($request);
 
