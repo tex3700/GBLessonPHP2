@@ -2,22 +2,20 @@
 
 namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
 
-use GeekBrains\LevelTwo\Blog\{Post, Repositories\UsersRepository\SqliteUsersRepository, UUID};
+use GeekBrains\LevelTwo\Person\Name;
+use GeekBrains\LevelTwo\Blog\{Post, Repositories\UsersRepository\SqliteUsersRepository, User, UUID};
 use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, PostNotFoundException, UserNotFoundException};
+use Psr\Log\LoggerInterface;
 use PDO;
 use PDOStatement;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
 
-    private PDO $connection;
-
-    /**
-     * @param PDO $connection
-     */
-    public function __construct(PDO $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+		private PDO $connection,
+		private LoggerInterface $logger,
+	) {
     }
 
 
@@ -34,6 +32,8 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
             ':post_title' => $post->getPostHeader(),
             ':post_text' => $post->getText()
         ]);
+
+		$this->logger->info("Post ({$post->uuid()}) was saved to database");
     }
 
     /**
@@ -44,7 +44,16 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
     public function get(UUID $uuid): Post
     {
         $statement = $this->connection->prepare(
-            'SELECT * FROM posts WHERE uuid = ?'
+            'SELECT 
+    				posts.uuid ,
+    				posts.author_uuid,
+    				posts.post_title,
+    				posts.post_text,
+    				users.username, 
+    				users.first_name, 
+    				users.last_name
+    				FROM posts INNER JOIN users ON users.uuid = posts.auhtor_uuid
+    				    WHERE uuid = ?'
         );
         $statement->execute([(string)$uuid]);
 
@@ -62,19 +71,27 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($result === false) {
+			$this->logger->warning("Post ($errString) not found");
             throw new PostNotFoundException(
                 "Cannot find post: $errString"
             );
         }
 
-        $userRepository = new SqliteUsersRepository($this->connection);
-        $user = $userRepository->get(new UUID($result['author_uuid']));
+        //$userRepository = new SqliteUsersRepository($this->connection);
+        //$user = $userRepository->get(new UUID($result['author_uuid']));
 
         return new Post(
             new UUID($result['uuid']),
-            $user,
+            new User(
+				new UUID($result['author_uuid']),
+				new Name(
+					$result['first_name'],
+					$result['last_name'],
+				),
+				$result['username'],
+			),
             $result['post_title'],
-            $result['post_text']
+            $result['post_text'],
         );
     }
 

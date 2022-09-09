@@ -71,9 +71,9 @@ class CreateLikes implements ActionInterface
 
 		try {
 			$like = new Like(
-				$newLikeUuid,
-				$post_uuid,
-				$author_uuid,
+				uuid: $newLikeUuid,
+				post_uuid: $post_uuid,
+				author_uuid: $author_uuid,
 			);
 		} catch (HttpException $exception) {
 			return new ErrorResponse($exception->getMessage());

@@ -2,6 +2,7 @@
 
 namespace GeekBrains\PHPUnit\Repositories\CommentsRepository;
 
+use GeekBrains\PHPUnit\DummyLogger;
 use GeekBrains\LevelTwo\Blog\{Post, User, UUID};
 use GeekBrains\LevelTwo\Blog\Comment;
 use GeekBrains\LevelTwo\Blog\Exceptions\{CommentNotFoundException,
@@ -34,7 +35,10 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
 
         $user = new User(
             new UUID('723e4567-e89b-12d3-a456-426614174009'),
@@ -83,7 +87,10 @@ class SqliteCommentsRepositoryTest extends TestCase
 
         $connectionStub->method('prepare')->willReturn($statementMock);
 
-        $commentsRepository = new SqliteCommentsRepository($connectionStub);
+        $commentsRepository = new SqliteCommentsRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
         $comment = $commentsRepository->get(new UUID('7b094211-1881-40f4-ac73-365ad0b2b2d4'));
 
         $this->assertSame('7b094211-1881-40f4-ac73-365ad0b2b2d4', (string)$comment->uuid());
@@ -104,7 +111,10 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
 
         $this->expectExceptionMessage('Cannot find comment: d02eef61-1a06-460f-b859-202b84164734');
         $this->expectException(CommentNotFoundException::class);

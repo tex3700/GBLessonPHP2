@@ -2,17 +2,24 @@
 
 namespace GeekBrains\PHPUnit\Repositories\UsersRepository;
 
-use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\{
+	UserNotFoundException,
+	InvalidArgumentException,
+};
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Person\Name;
+use GeekBrains\PHPUnit\DummyLogger;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\TestCase;
 
 class SqliteUsersRepositoryTest extends TestCase
 {
+	/**
+	 * @throws InvalidArgumentException
+	 */
 	public function testItThrowsAnExceptionWhenUserNotFound(): void
 	{
 		$connectionMock = $this->createStub(PDO::class);
@@ -20,7 +27,10 @@ class SqliteUsersRepositoryTest extends TestCase
 		$statementStub->method('fetch')->willReturn(false);
 		$connectionMock->method('prepare')->willReturn($statementStub);
 
-		$repository = new SqliteUsersRepository($connectionMock);
+		$repository = new SqliteUsersRepository(
+			$connectionMock,
+			new DummyLogger()
+		);
 		$this->expectException(UserNotFoundException::class);
 		$this->expectExceptionMessage('Cannot find user: Ivan');
 
@@ -50,7 +60,10 @@ class SqliteUsersRepositoryTest extends TestCase
 		$connectionStub->method('prepare')->willReturn($statementMock);
 
 // 1. Передаём в репозиторий стаб подключения
-		$repository = new SqliteUsersRepository($connectionStub);
+		$repository = new SqliteUsersRepository(
+			$connectionStub,
+			new DummyLogger()
+		);
 
 // Вызываем метод сохранения пользователя
 		$repository->save(
