@@ -12,7 +12,8 @@ use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterfa
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\HTTP\Actions\ActionInterface;
-use GeekBrains\LevelTwo\HTTP\Auth\IdentificationInterface;
+use GeekBrains\LevelTwo\HTTP\Auth\AuthenticationInterface;
+use GeekBrains\LevelTwo\HTTP\Auth\TokenAuthenticationInterface;
 use GeekBrains\LevelTwo\HTTP\ErrorResponse;
 use GeekBrains\LevelTwo\HTTP\Request;
 use GeekBrains\LevelTwo\HTTP\Response;
@@ -22,7 +23,7 @@ use Psr\Log\LoggerInterface;
 class CreatePost implements ActionInterface
 {
 	public function __construct(
-		private IdentificationInterface $identification,
+		private TokenAuthenticationInterface $authentication,
 		private PostsRepositoryInterface $postsRepository,
 		private LoggerInterface $logger
 	) {
@@ -31,11 +32,12 @@ class CreatePost implements ActionInterface
 	/**
 	 * @throws InvalidArgumentException
 	 * @throws AuthException
+	 * @throws UserNotFoundException
 	 */
 	public function handle(Request $request): Response
 	{
 		try {
-			$author = $this->identification->user($request);
+			$author = $this->authentication->user($request);
 		} catch (AuthException | UserNotFoundException $exception) {
 			return new ErrorResponse($exception->getMessage());
 		}

@@ -52,10 +52,11 @@ class FindByUsernameActionTest extends TestCase
 			}
 		};
 	}
+
 	/**
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
-	 * @throws JsonException
+	 * @throws \JsonException
 	 */
 	public function testItReturnsErrorResponseIfNoUsernameProvided(): void
 	{
@@ -74,7 +75,7 @@ class FindByUsernameActionTest extends TestCase
 	/**
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
-	 * @throws JsonException
+	 * @throws \JsonException
 	 */
 	public function testItReturnsErrorResponseIfUserNotFound(): void
 	{
@@ -90,7 +91,7 @@ class FindByUsernameActionTest extends TestCase
 	/**
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
-	 * @throws InvalidArgumentException|JsonException
+	 * @throws InvalidArgumentException|\JsonException
 	 */
 
 	public function testItReturnsSuccessfulResponse(): void
@@ -103,7 +104,7 @@ class FindByUsernameActionTest extends TestCase
 				UUID::random(),
 				new Name('Ivan', 'Nikitin'),
 				'ivan',
-
+					'123'
 			),
 		]);
 		$action = new FindByUsername($usersRepository);
