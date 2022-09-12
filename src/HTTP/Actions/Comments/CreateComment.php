@@ -3,7 +3,9 @@
 namespace GeekBrains\LevelTwo\HTTP\Actions\Comments;
 
 use GeekBrains\LevelTwo\Blog\Comment;
-use GeekBrains\LevelTwo\Blog\Exceptions\{HttpException,
+use GeekBrains\LevelTwo\HTTP\Auth\TokenAuthenticationInterface;
+use GeekBrains\LevelTwo\Blog\Exceptions\{AuthException,
+	HttpException,
 	InvalidArgumentException,
 	PostNotFoundException,
 	UserNotFoundException};
@@ -20,7 +22,7 @@ use GeekBrains\LevelTwo\HTTP\SuccessfulResponse;
 class CreateComment implements ActionInterface
 {
 	public function __construct(
-		private UsersRepositoryInterface $usersRepository,
+		private TokenAuthenticationInterface $authentication,
 		private PostsRepositoryInterface $postsRepository,
 		private CommentsRepositoryInterface $commentsRepository,
 	) {
@@ -31,15 +33,21 @@ class CreateComment implements ActionInterface
 	 */
 	public function handle(Request $request): Response
 	{
-		try {
-			$author_uuid = new UUID($request->jsonBodyField('author_uuid'));
-		} catch (HttpException | InvalidArgumentException $exception) {
-			return new ErrorResponse($exception->getMessage());
-		}
+//		try {
+//			$author_uuid = new UUID($request->jsonBodyField('author_uuid'));
+//		} catch (HttpException | InvalidArgumentException $exception) {
+//			return new ErrorResponse($exception->getMessage());
+//		}
+//
+//		try {
+//			$user = $this->usersRepository->get($author_uuid);
+//		} catch (UserNotFoundException $exception) {
+//			return new ErrorResponse($exception->getMessage());
+//		}
 
 		try {
-			$user = $this->usersRepository->get($author_uuid);
-		} catch (UserNotFoundException $exception) {
+			$user = $this->authentication->user($request);
+		} catch (AuthException | UserNotFoundException $exception) {
 			return new ErrorResponse($exception->getMessage());
 		}
 

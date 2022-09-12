@@ -44,6 +44,7 @@ class SqliteCommentsRepositoryTest extends TestCase
             new UUID('723e4567-e89b-12d3-a456-426614174009'),
             new Name('first_name', 'last_name'),
             'name',
+			'123'
         );
 
         $post = new Post(
@@ -82,7 +83,8 @@ class SqliteCommentsRepositoryTest extends TestCase
             'post_text' => 'Some text',
             'username' => 'ivan123',
             'first_name' => 'Ivan',
-            'last_name' => 'Nikitin'
+            'last_name' => 'Nikitin',
+			'password' => '123'
         ]);
 
         $connectionStub->method('prepare')->willReturn($statementMock);

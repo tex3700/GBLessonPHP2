@@ -60,8 +60,9 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
     				users.username,
     				users.first_name,
     				users.last_name,
+    				users.password
     				FROM comments 
-    				INNER JOIN users ON users.uuid = comments.author_uuid
+    				INNER JOIN users ON users.user_id = comments.author_uuid
     				WHERE uuid = ?'
         );
         $statement->execute([(string)$uuid]);
@@ -98,6 +99,7 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
 				$result['last_name'],
 			),
 			$result['username'],
+			$result['password'],
 		);
 
 		$postsRepository = new SqlitePostsRepository(

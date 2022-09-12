@@ -2,12 +2,13 @@
 
 use GeekBrains\LevelTwo\HTTP\Actions\Comments\CreateComment;
 use GeekBrains\LevelTwo\HTTP\Actions\Users\CreateUser;
-use GeekBrains\LevelTwo\HTTP\Actions\Likes\{CreateLikes, CreateCommentLikes};
+use GeekBrains\LevelTwo\HTTP\Actions\Likes\{CreateLike, CreateCommentLike};
 use GeekBrains\LevelTwo\HTTP\Actions\Posts\{CreatePost, DeletePost};
 use GeekBrains\LevelTwo\HTTP\Actions\Users\FindByUsername;
 use GeekBrains\LevelTwo\HTTP\Request;
 use GeekBrains\LevelTwo\Blog\Exceptions\{HttpException, JsonException};
 use GeekBrains\LevelTwo\HTTP\ErrorResponse;
+use GeekBrains\LevelTwo\HTTP\Actions\Auth\{LogIn, LogOut};
 use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -46,8 +47,10 @@ $routes = [
 		'/users/create' => CreateUser::class,
 		'/posts/create' => CreatePost::class,
 		'/posts/comment' => CreateComment::class,
-		'/posts/likes' => CreateLikes::class,
-		'/comments/likes' => CreateCommentLikes::class,
+		'/posts/like' => CreateLike::class,
+		'/comments/like' => CreateCommentLike::class,
+		'/login' => LogIn::class,
+		'/logout' => LogOut::class,
 	],
 
 	'DELETE' => [

@@ -3,6 +3,7 @@
 namespace GeekBrains\LevelTwo\HTTP\Actions\Users;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
+use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
@@ -24,26 +25,35 @@ class CreateUser implements ActionInterface
 	public function handle(Request $request): Response
 	{
 		try {
-			$newUserUuid = UUID::random();
+//			$newUserUuid = UUID::random();
 
-			$user = new User(
-				$newUserUuid,
+//			$user = new User(
+//				$newUserUuid,
+//				new Name(
+//					$request->jsonBodyField('first_name'),
+//					$request->jsonBodyField('last_name')
+//				),
+//				$request->jsonBodyField('username'),
+//				$request->jsonBodyField('password')
+//			);
+
+			$user = User::creatFrom(
 				new Name(
 					$request->jsonBodyField('first_name'),
 					$request->jsonBodyField('last_name')
 				),
-				$request->jsonBodyField('username')
+				$request->jsonBodyField('username'),
+				$request->jsonBodyField('password')
 			);
 
-		} catch (HttpException $e) {
-			return new ErrorResponse($e->getMessage());
-
+		} catch (HttpException | InvalidArgumentException $exception) {
+			return new ErrorResponse($exception->getMessage());
 		}
 
 		$this->usersRepository->save($user);
 
 		return new SuccessfulResponse([
-			'uuid' => (string)$newUserUuid,
+			'uuid' => (string)$user->uuid(),
 		]);
 	}
 }

@@ -8,7 +8,10 @@ use PHPUnit\Framework\TestCase;
 
 class ArgumentsTest extends TestCase
 {
-    public function testItReturnsArgumentsValueByName(): void
+	/**
+	 * @throws ArgumentsException
+	 */
+	public function testItReturnsArgumentsValueByName(): void
     {
         // Подготовка
         $arguments = new Arguments(['some_key' => 123]);

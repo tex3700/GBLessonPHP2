@@ -45,14 +45,15 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
     {
         $statement = $this->connection->prepare(
             'SELECT 
-    				posts.uuid ,
+    				posts.uuid,
     				posts.author_uuid,
     				posts.post_title,
     				posts.post_text,
     				users.username, 
     				users.first_name, 
-    				users.last_name
-    				FROM posts INNER JOIN users ON users.uuid = posts.auhtor_uuid
+    				users.last_name,
+    				users.password
+    				FROM posts INNER JOIN users ON users.user_id = posts.author_uuid
     				    WHERE uuid = ?'
         );
         $statement->execute([(string)$uuid]);
@@ -89,6 +90,7 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
 					$result['last_name'],
 				),
 				$result['username'],
+				$result['password']
 			),
             $result['post_title'],
             $result['post_text'],

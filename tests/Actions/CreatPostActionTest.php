@@ -15,6 +15,7 @@ use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Http\Actions\Posts\CreatePost;
 use GeekBrains\LevelTwo\HTTP\Auth\IdentificationInterface;
 use GeekBrains\LevelTwo\HTTP\Auth\JsonBodyUuidIdentification;
+use GeekBrains\LevelTwo\HTTP\Auth\TokenAuthenticationInterface;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
@@ -24,9 +25,9 @@ use PHPUnit\Framework\TestCase;
 
 class CreatPostActionTest extends TestCase
 {
-	private function identification($userRepository): IdentificationInterface
+	private function identification($userRepository): TokenAuthenticationInterface
 	{
-		return new class($userRepository) implements IdentificationInterface
+		return new class($userRepository) implements TokenAuthenticationInterface
 		{
 			public function __construct(
 				private UsersRepositoryInterface $usersRepository
@@ -130,7 +131,7 @@ class CreatPostActionTest extends TestCase
 				new UUID('10373537-0805-4d7a-830e-22b481b4859c'),
 				new Name('name', 'surname'),
 				'username',
-
+				'123'
 			),
 		]);
 
@@ -207,7 +208,9 @@ class CreatPostActionTest extends TestCase
 		$usersRepository = $this->usersRepository([
 			new User(
 				new UUID('10373537-0805-4d7a-830e-22b481b4859c'),
-				new Name('Ivan', 'Nikitin'), 'ivan',
+				new Name('Ivan', 'Nikitin'),
+				'ivan',
+				'123'
 			),
 		]);
 
