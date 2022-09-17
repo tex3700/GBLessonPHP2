@@ -3,7 +3,8 @@
 namespace GeekBrains\PHPUnit\Commands;
 
 use GeekBrains\LevelTwo\Blog\Commands\Arguments;
-use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
+use GeekBrains\LevelTwo\Blog\Commands\CreateUserConsoleCommand;
+use GeekBrains\LevelTwo\Blog\Commands\User\CreatUserCommand;
 use GeekBrains\LevelTwo\Blog\Exceptions\ArgumentsException;
 use GeekBrains\LevelTwo\Blog\Exceptions\CommandException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
@@ -14,16 +15,144 @@ use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\PHPUnit\DummyLogger;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\{
+	RuntimeException,
+	ExceptionInterface
+};
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
 
 class CreateUserCommandTest extends TestCase
 {
+	/**
+	 * @throws ExceptionInterface
+	 */
+	public function testItFromConsoleRequiresLastName(): void
+	{
+		$command = new CreatUserCommand(
+			$this->makeUsersRepository()
+		);
+
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage(
+			'Not enough arguments (missing: "last_name").'
+		);
+
+		$command->run(
+			new ArrayInput([
+				"first_name" => "Vladimir",
+				"username" => "user222",
+				"password" => "123"
+					]),
+			new NullOutput()
+		);
+	}
+
+	/**
+	 * @throws ExceptionInterface
+	 */
+	public function testItFromConsoleRequiresPassword(): void
+	{
+		$command = new CreatUserCommand(
+			$this->makeUsersRepository()
+		);
+
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage(
+			'Not enough arguments (missing: "password").'
+		);
+
+		$command->run(
+			new ArrayInput([
+				"first_name" => "Vladimir",
+				"last_name" => "Ivanov",
+				"username" => "user222"
+			]),
+			new NullOutput()
+		);
+	}
+
+	/**
+	 * @throws ExceptionInterface
+	 */
+	public function testItFromConsoleRequiresFirstName(): void
+	{
+		$command = new CreatUserCommand(
+			$this->makeUsersRepository()
+		);
+
+		$this->expectException(RuntimeException::class);
+		$this->expectExceptionMessage(
+			'Not enough arguments (missing: "first_name").'
+		);
+
+		$command->run(
+			new ArrayInput([
+				"last_name" => "Ivanov",
+				"username" => "user222",
+				"password" => "123"
+			]),
+			new NullOutput()
+		);
+	}
+
+	/**
+	 * @throws ExceptionInterface
+	 */
+	public function testItFromConsoleSavesUserToRepository(): void
+	{
+		$usersRepository = new class implements UsersRepositoryInterface {
+
+			private bool $called = false;
+
+			public function save(User $user): void
+			{
+				$this->called = true;
+			}
+
+			public function get(UUID $uuid): User
+			{
+				throw new UserNotFoundException("User not found");
+			}
+
+			public function getByUsername(string $username): User
+			{
+				throw new UserNotFoundException("User not found");
+			}
+
+			public function delete(UUID $uuid): void
+			{
+				// TODO: Implement delete() method.
+			}
+
+			public function wasCalled(): bool
+			{
+				return $this->called;
+			}
+
+		};
+		$command = new CreatUserCommand($usersRepository);
+
+		$command->run(
+			new ArrayInput([
+				"first_name" => "Vladimir",
+				"last_name" => "Ivanov",
+				"username" => "user222",
+				"password" => "123"
+			]),
+			new NullOutput()
+		);
+
+		$this->assertTrue($usersRepository->wasCalled());
+	}
+
 	/**
 	 * @throws ArgumentsException
 	 * @throws InvalidArgumentException
 	 */
 	public function testItThrowsAnExceptionWhenUserAlreadyExists(): void
     {
-        $command = new CreateUserCommand(
+        $command = new CreateUserConsoleCommand(
 			new DummyUsersRepository(),
 			new DummyLogger()
 		);
@@ -78,7 +207,7 @@ class CreateUserCommandTest extends TestCase
 		};
 // Передаём объект анонимного класса
 // в качестве реализации UsersRepositoryInterface
-        $command = new CreateUserCommand(
+        $command = new CreateUserConsoleCommand(
 			$usersRepository,
 			new DummyLogger()
 		);
@@ -99,7 +228,7 @@ class CreateUserCommandTest extends TestCase
 	public function testItRequiresLastName(): void
     {
 // Передаём в конструктор команды объект, возвращаемый нашей функцией
-        $command = new CreateUserCommand(
+        $command = new CreateUserConsoleCommand(
 			$this->makeUsersRepository(),
 			new DummyLogger()
 		);
@@ -186,7 +315,7 @@ class CreateUserCommandTest extends TestCase
 			}
 		};
 
-        $command = new CreateUserCommand(
+        $command = new CreateUserConsoleCommand(
 			$usersRepository,
 			new DummyLogger()
 		);
@@ -208,7 +337,7 @@ class CreateUserCommandTest extends TestCase
 	 */
 	public function  testItRequiresPassword(): void
 	{
-		$command = new CreateUserCommand(
+		$command = new CreateUserConsoleCommand(
 			$this->makeUsersRepository(),
 			new DummyLogger()
 			);

@@ -2,7 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
-use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, UserNotFoundException};
+use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, UserNotFoundException, UserRepositoryException};
 use GeekBrains\LevelTwo\Blog\{User, UUID};
 use GeekBrains\LevelTwo\Person\Name;
 use \PDO;
@@ -21,8 +21,22 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     public function save(User $user): void
     {
         $statement = $this->connection->prepare(
-            'INSERT INTO users (user_id, username, first_name, last_name, password)
-        VALUES (:uuid, :username, :first_name, :last_name, :password)'
+            'INSERT INTO users (
+                   user_id, 
+                   username, 
+                   first_name, 
+                   last_name, 
+                   password
+                   ) VALUES (
+                	:uuid, 
+                	:username, 
+                	:first_name, 
+                	:last_name, 
+                	:password
+                ) 
+                ON CONFLICT (user_id) DO UPDATE SET 
+                	first_name = :first_name,
+                    last_name = :last_name'
         );
 
         $statement->execute([
@@ -93,12 +107,24 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     }
 
 
+	/**
+	 * @throws UserRepositoryException
+	 */
 	public function delete(UUID $uuid): void
 	{
-		$statement = $this->connection->prepare(
-			'DELETE FROM users WHERE uuid = :uuid'
-		);
+		try {
+			$statement = $this->connection->prepare(
+				'DELETE FROM users WHERE uuid = :uuid'
+			);
+			$statement->execute([':uuid' => $uuid]);
 
-		$statement->execute([':uuid' => $uuid]);
+		} catch (\PDOException $exception) {
+			throw new UserRepositoryException(
+				$exception->getMessage(),
+				(int)$exception->getCode(),
+				$exception
+			);
+		}
+
 	}
 }

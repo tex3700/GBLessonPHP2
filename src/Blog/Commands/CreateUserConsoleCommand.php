@@ -13,7 +13,7 @@ use GeekBrains\LevelTwo\Person\Name;
 use Psr\Log\LoggerInterface;
 
 
-class CreateUserCommand
+class CreateUserConsoleCommand
 {
 
 // Команда зависит от контракта репозитория пользователей,
