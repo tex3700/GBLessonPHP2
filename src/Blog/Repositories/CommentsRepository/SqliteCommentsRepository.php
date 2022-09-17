@@ -4,6 +4,7 @@ namespace GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository;
 
 use GeekBrains\LevelTwo\Blog\Comment;
 use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\CommentsRepositoryException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
@@ -115,12 +116,24 @@ VALUES (:uuid, :post_uuid, :author_uuid, :comment_text)'
         );
     }
 
+	/**
+	 * @throws CommentsRepositoryException
+	 */
 	public function delete(UUID $uuid): void
 	{
-		$statement = $this->connection->prepare(
-			'DELETE FROM comments WHERE uuid = :uuid'
-		);
+		try {
+			$statement = $this->connection->prepare(
+				'DELETE FROM comments WHERE uuid = :uuid'
+			);
+			$statement->execute([':uuid' => $uuid]);
 
-		$statement->execute([':uuid' => $uuid]);
+		} catch (\PDOException $exception) {
+			throw new CommentsRepositoryException(
+				$exception->getMessage(),
+				(int)$exception->getCode(),
+				$exception
+			);
+		}
+
 	}
 }

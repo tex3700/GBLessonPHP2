@@ -27,7 +27,7 @@ class DeletePost implements ActionInterface
 	public function handle(Request $request): Response
 	{
 		try {
-			$postUuid = $request->query('uuid');
+			$postUuid = $request->query('post_uuid');
 			$this->postsRepository->get(new UUID($postUuid));
 		} catch (PostNotFoundException $exception) {
 			return new ErrorResponse($exception->getMessage());
@@ -36,7 +36,7 @@ class DeletePost implements ActionInterface
 		$this->postsRepository->delete(new UUID($postUuid));
 
 		return new SuccessfulResponse([
-			'uuid' => $postUuid
+			'post_uuid' => $postUuid
 		]);
 	}
 }
