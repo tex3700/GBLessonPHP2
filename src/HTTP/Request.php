@@ -68,7 +68,7 @@ class Request
 
 		$headerName = mb_strtoupper("http_" . str_replace("-", "_", $header));
 
-		if (!array_key_exists($header, $this->server)) {
+		if (!array_key_exists($headerName, $this->server)) {
 			throw new HttpException(
 				"No such header in the request: $header"
 			);

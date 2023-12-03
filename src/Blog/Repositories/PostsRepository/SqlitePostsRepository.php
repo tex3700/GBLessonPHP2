@@ -4,7 +4,10 @@ namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
 
 use GeekBrains\LevelTwo\Person\Name;
 use GeekBrains\LevelTwo\Blog\{Post, Repositories\UsersRepository\SqliteUsersRepository, User, UUID};
-use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException, PostNotFoundException, UserNotFoundException};
+use GeekBrains\LevelTwo\Blog\Exceptions\{InvalidArgumentException,
+	PostNotFoundException,
+	PostRepositoryException,
+	UserNotFoundException};
 use Psr\Log\LoggerInterface;
 use PDO;
 use PDOStatement;
@@ -45,14 +48,15 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
     {
         $statement = $this->connection->prepare(
             'SELECT 
-    				posts.uuid ,
+    				posts.uuid,
     				posts.author_uuid,
     				posts.post_title,
     				posts.post_text,
     				users.username, 
     				users.first_name, 
-    				users.last_name
-    				FROM posts INNER JOIN users ON users.uuid = posts.auhtor_uuid
+    				users.last_name,
+    				users.password
+    				FROM posts INNER JOIN users ON users.user_id = posts.author_uuid
     				    WHERE uuid = ?'
         );
         $statement->execute([(string)$uuid]);
@@ -89,6 +93,7 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
 					$result['last_name'],
 				),
 				$result['username'],
+				$result['password']
 			),
             $result['post_title'],
             $result['post_text'],
@@ -96,12 +101,25 @@ VALUES (:uuid, :author_uuid, :post_title, :post_text)'
     }
 
 
+	/**
+	 * @throws PostRepositoryException
+	 */
 	public function delete(UUID $uuid): void
 	{
-		$statement = $this->connection->prepare(
-			'DELETE FROM posts WHERE uuid = :uuid'
-		);
+		try {
+			$statement = $this->connection->prepare(
+				'DELETE FROM posts WHERE uuid = :uuid'
+			);
 
-		$statement->execute([':uuid' => $uuid]);
+			$statement->execute([':uuid' => $uuid]);
+
+		} catch (\PDOException $exception) {
+			throw new PostRepositoryException(
+				$exception->getMessage(),
+				(int)$exception->getCode(),
+				$exception
+			);
+		}
+
 	}
 }

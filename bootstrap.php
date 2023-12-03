@@ -1,22 +1,45 @@
 <?php
 
 use GeekBrains\LevelTwo\Blog\Container\DIContainer;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\LikesRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\SqliteLikesRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\CommentLikesRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\SqliteCommentLikesRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
+use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\{
+	UsersRepositoryInterface,
+	SqliteUsersRepository
+};
+use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\{
+	PostsRepositoryInterface,
+	SqlitePostsRepository
+};
+use GeekBrains\LevelTwo\Blog\Repositories\LikesRepository\{
+	LikesRepositoryInterface,
+	SqliteLikesRepository,
+	CommentLikesRepositoryInterface,
+	SqliteCommentLikesRepository,
+
+};
+use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\{
+	CommentsRepositoryInterface,
+	SqliteCommentsRepository,
+};
+use GeekBrains\LevelTwo\Blog\Repositories\AuthTokensRepository\{
+	AuthTokensRepositoryInterface,
+	SqliteAuthTokensRepository,
+};
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Dotenv\Dotenv;
-use GeekBrains\LevelTwo\HTTP\Auth\IdentificationInterface;
-use GeekBrains\LevelTwo\HTTP\Auth\JsonBodyUuidIdentification;
+use GeekBrains\LevelTwo\HTTP\Auth\{
+	IdentificationInterface,
+	JsonBodyUuidIdentification,
+	PasswordAuthentication,
+	PasswordAuthenticationInterface,
+	TokenAuthenticationInterface,
+	BearerTokenAuthentication
+};
+use Faker\Provider\Lorem;
+use Faker\Provider\ru_RU\Internet;
+use Faker\Provider\ru_RU\Person;
+use Faker\Provider\ru_RU\Text;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -44,6 +67,21 @@ if ($_SERVER['LOG_TO_CONSOLE'] === 'yes') {
 			new StreamHandler("php://stdout")
 		);
 }
+
+$container->bind(
+	TokenAuthenticationInterface::class,
+	BearerTokenAuthentication::class
+);
+
+$container->bind(
+	AuthTokensRepositoryInterface::class,
+	SqliteAuthTokensRepository::class
+);
+
+$container->bind(
+	PasswordAuthenticationInterface::class,
+	PasswordAuthentication::class
+);
 
 $container->bind(
 	IdentificationInterface::class,
@@ -83,6 +121,18 @@ $container->bind(
 $container->bind(
 	CommentLikesRepositoryInterface::class,
 	SqliteCommentLikesRepository::class
+);
+
+$faker = new \Faker\Generator();
+
+$faker->addProvider(new Person($faker));
+$faker->addProvider(new Internet($faker));
+$faker->addProvider(new Text($faker));
+$faker->addProvider(new Lorem($faker));
+
+$container->bind(
+	\Faker\Generator::class,
+	$faker
 );
 
 return $container;

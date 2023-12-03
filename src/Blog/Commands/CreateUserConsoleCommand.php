@@ -13,7 +13,7 @@ use GeekBrains\LevelTwo\Person\Name;
 use Psr\Log\LoggerInterface;
 
 
-class CreateUserCommand
+class CreateUserConsoleCommand
 {
 
 // Команда зависит от контракта репозитория пользователей,
@@ -33,6 +33,13 @@ class CreateUserCommand
 		$this->logger->info("Create user command started");
 
         $username = $arguments->get('username');
+		$name = new Name(
+			$arguments->get('first_name'),
+			$arguments->get('last_name')
+		);
+		$password = $arguments->get('password');
+//		$userUuid = UUID::random();
+//		$hash = hash('sha256', $password.$userUuid);
 
 // Проверяем, существует ли пользователь в репозитории
         if ($this->userExists($username)) {
@@ -41,14 +48,22 @@ class CreateUserCommand
 			throw new CommandException("User already exists: $username");
         }
         // Сохраняем пользователя в репозиторий
-        $this->usersRepository->save(new User(
-            uuid: UUID::random(),
-            name: new Name(
-                $arguments->get('first_name'),
-                $arguments->get('last_name')),
-            username: $username,
-        ));
+//        $this->usersRepository->save(new User(
+//            uuid: $userUuid,
+//            name: new Name(
+//                $arguments->get('first_name'),
+//                $arguments->get('last_name')),
+//            username: $username,
+//			hashedPassword: $hash,
+//        ));
 
+		$user = User::creatFrom(
+			$name,
+			$username,
+			$password
+		);
+
+		$this->usersRepository->save($user);
 		$this->logger->info("User created: uuid");
     }
     private function userExists(string $username): bool

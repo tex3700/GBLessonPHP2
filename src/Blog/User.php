@@ -5,26 +5,53 @@ use GeekBrains\LevelTwo\Person\Name;
 
 class User
 {
-    private UUID $uuid;
-    private Name $name;
-    private string $username;
+	public function __construct(
+		private UUID $uuid,
+		private Name $name,
+		private string $username,
+		private string $hashedPassword,
+	) {
+	}
 
-    /**
-     * @param UUID $uuid
-     * @param Name $name
-     * @param string $username
-     */
-    public function __construct(UUID $uuid, Name $name, string $username)
-    {
-        $this->uuid = $uuid;
-        $this->name = $name;
-        $this->username = $username;
-    }
+	public function __toString(): string
+	{
+		return "Юзер $this->uuid с именем $this->name и логином $this->username." . PHP_EOL;
+	}
 
-    public function __toString(): string
-    {
-        return "Юзер $this->uuid с именем $this->name и логином $this->username." . PHP_EOL;
-    }
+	/**
+	 * @return string
+	 */
+	public function hashedPassword(): string
+	{
+		return $this->hashedPassword;
+	}
+
+	private static function hash(string $password, UUID $uuid): string
+	{
+		return hash('sha256', $password.$uuid);
+	}
+
+	public function checkPassword(string $password): bool
+	{
+		return $this->hashedPassword === self::hash($password, $this->uuid);
+	}
+
+	/**
+	 * @throws Exceptions\InvalidArgumentException
+	 */
+	public static function creatFrom(
+		Name $name,
+		string $username,
+		string $password
+	): self
+	{
+		return new self(
+			$uuid = UUID::random(),
+			$name,
+			$username,
+			self::hash($password, $uuid)
+		);
+	}
 
     /**
      * @return UUID
